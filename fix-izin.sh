@@ -1,59 +1,89 @@
 #!/bin/bash
-# Mimo V2.6 Flash - License Authorization System
+# License Authorization System
 # Owner: harisprayoga1236-ctrl
 # Repository: https://github.com/harisprayoga1236-ctrl/izin
 
-IZIN_URL="https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/ip"
-CACHE_DIR="/tmp/izin_cache"
-CACHE_FILE="$CACHE_DIR/iplist.txt"
+IZIN_URL="https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/ip?nocache=$(date +%s)"
+CACHE_FILE="/tmp/izin_cache/iplist.txt"
 IPSAVE_FILE="/usr/bin/ipsave"
 USER_FILE="/usr/bin/user"
 EXP_FILE="/usr/bin/e"
 
-mkdir -p "$CACHE_DIR" /etc/xray
-
-# Get VPS IP address
+# 1. Ambil IP publik VPS
 MYIP=$(
-  curl -s --max-time 5 ipv4.icanhazip.com ||
-  curl -s --max-time 5 ifconfig.me ||
-  wget -qO- ipinfo.io/ip
+  curl -fsS --max-time 5 https://ipv4.icanhazip.com 2>/dev/null ||
+  curl -fsS --max-time 5 https://ifconfig.me/ip 2>/dev/null ||
+  wget -qO- --timeout=5 https://ipinfo.io/ip 2>/dev/null
 )
+MYIP=$(printf '%s' "$MYIP" | tr -d '[:space:]')
 
-[ -z "$MYIP" ] && { echo "❌ Gagal mengambil IP"; exit 1; }
+if [ -z "$MYIP" ]; then
+  echo "❌ Gagal mengambil IP"
+  exit 1
+fi
 echo "$MYIP" > "$IPSAVE_FILE"
 
-# Fetch/refresh license file if missing or older than 10 minutes
-if [ ! -f "$CACHE_FILE" ] || find "$CACHE_FILE" -mmin +10 | grep -q .; then
-  curl -s --max-time 8 "$IZIN_URL" -o "$CACHE_FILE"
+# 2. Selalu download file license terbaru (cache-busting, tanpa cache lama)
+mkdir -p "$(dirname "$CACHE_FILE")"
+if ! curl -fsS --max-time 10 "$IZIN_URL" -o "$CACHE_FILE" || [ ! -s "$CACHE_FILE" ]; then
+  rm -f "$CACHE_FILE"
+  echo "❌ GAGAL MENGAMBIL FILE LICENSE"
+  exit 1
 fi
 
-# Check if IP is registered in license
-DATA=$(grep -w "$MYIP" "$CACHE_FILE")
+# 3. Cocokkan kolom pertama dengan IP VPS (abaikan baris kosong & komentar #)
+DATA=""
+while IFS= read -r line || [ -n "$line" ]; do
+  line=$(printf '%s' "$line" | tr -d '\r')
+  case "$line" in
+    ''|\#*) continue ;;
+  esac
+  set -- $line
+  if [ "$1" = "$MYIP" ]; then
+    DATA="$line"
+    break
+  fi
+done < "$CACHE_FILE"
+
 if [ -z "$DATA" ]; then
-  echo "❌ IP TIDAK TERDAFTAR"
+  echo "❌ IP VPS BELUM TERDAFTAR"
+  echo "IP: $MYIP"
   rm -f "$USER_FILE" "$EXP_FILE"
   exit 1
 fi
 
-# Extract username and expired date
-USERNAME=$(awk '{print $2}' <<< "$DATA")
-EXPIRED=$(awk '{print $3}' <<< "$DATA")
+# 4. Ambil username (kolom 2) dan tanggal expired (kolom 3)
+set -- $DATA
+USERNAME="$2"
+EXPIRED="$3"
 
-# Save to local files
+if [ -z "$USERNAME" ] || [ -z "$EXPIRED" ]; then
+  echo "❌ Format license tidak valid"
+  echo "Baris: $DATA"
+  rm -f "$USER_FILE" "$EXP_FILE"
+  exit 1
+fi
+
+# 5. Validasi tanggal expired (format YYYY-MM-DD)
+if ! printf '%s' "$EXPIRED" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+  echo "❌ Format tanggal expired tidak valid: $EXPIRED"
+  rm -f "$USER_FILE" "$EXP_FILE"
+  exit 1
+fi
+
+if [[ "$EXPIRED" < "$(date +%Y-%m-%d)" ]]; then
+  echo "❌ LICENSE SUDAH EXPIRED"
+  echo "Expired: $EXPIRED"
+  rm -f "$USER_FILE" "$EXP_FILE"
+  exit 1
+fi
+
+# 6. Simpan license
 echo "$USERNAME" > "$USER_FILE"
 echo "$EXPIRED" > "$EXP_FILE"
-
-# Export for other uses
 export IP="$MYIP"
 export MYIP="$MYIP"
 
-# Get optional info
-city="$(curl -fsS --max-time 5 ipinfo.io/city 2>/dev/null | tr -d '\r')"
-[ -n "$city" ] && echo "$city" > /etc/xray/city
-isp="$(curl -fsS --max-time 5 ipinfo.io/org 2>/dev/null | tr -d '\r' | cut -d' ' -f2-)"
-[ -n "$isp" ] && echo "$isp" > /etc/xray/isp
-
-# Display license status
 clear
 printf '%s\n' \
 "━━━━━━━━━━━━━━━━━━━━━━" \
@@ -61,8 +91,6 @@ printf '%s\n' \
 " USER   : $USERNAME" \
 " EXP    : $EXPIRED" \
 " IP     : $MYIP" \
-" CITY   : $city" \
-" ISP    : $isp" \
 "━━━━━━━━━━━━━━━━━━━━━━"
 sleep 2
 clear
