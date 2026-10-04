@@ -9,7 +9,7 @@ IPSAVE_FILE="/usr/bin/ipsave"
 USER_FILE="/usr/bin/user"
 EXP_FILE="/usr/bin/e"
 
-# 1. Ambil IP publik VPS
+# 1. Ambil IP publik VPS secara otomatis
 MYIP=$(
   curl -fsS --max-time 5 https://ipv4.icanhazip.com 2>/dev/null ||
   curl -fsS --max-time 5 https://ifconfig.me/ip 2>/dev/null ||
@@ -31,20 +31,15 @@ if ! curl -fsS --max-time 10 "$IZIN_URL" -o "$CACHE_FILE" || [ ! -s "$CACHE_FILE
   exit 1
 fi
 
-# 3. Cocokkan kolom pertama dengan IP VPS (abaikan baris kosong & komentar #)
-DATA=""
-while IFS= read -r line || [ -n "$line" ]; do
-  line=$(printf '%s' "$line" | tr -d '\r')
-  case "$line" in
-    ''|\#*) continue ;;
-  esac
-  set -- $line
-  if [ "$1" = "$MYIP" ]; then
-    DATA="$line"
-    break
-  fi
-done < "$CACHE_FILE"
+# 3. Cari IP spesifik di kolom pertama (abaikan baris kosong & komentar #)
+DATA=$(awk -v ip="$MYIP" '$1 == ip {print; exit}' "$CACHE_FILE")
 
+# 4. Jika IP spesifik tidak ditemukan, cek baris ALL
+if [ -z "$DATA" ]; then
+  DATA=$(awk '$1 == "ALL" {print; exit}' "$CACHE_FILE")
+fi
+
+# 5. Jika keduanya tidak ada, tolak
 if [ -z "$DATA" ]; then
   echo "❌ IP VPS BELUM TERDAFTAR"
   echo "IP: $MYIP"
@@ -52,25 +47,27 @@ if [ -z "$DATA" ]; then
   exit 1
 fi
 
-# 4. Ambil username (kolom 2) dan tanggal expired (kolom 3)
-set -- $DATA
-USERNAME="$2"
-EXPIRED="$3"
+# 6. Ekstrak username (kolom 2) dan expired (kolom 3)
+USERNAME=$(echo "$DATA" | awk '{print $2}')
+EXPIRED=$(echo "$DATA" | awk '{print $3}')
 
+# 7. Validasi username & expired tidak kosong
 if [ -z "$USERNAME" ] || [ -z "$EXPIRED" ]; then
-  echo "❌ Format license tidak valid"
+  echo "❌ FORMAT LICENSE TIDAK VALID"
   echo "Baris: $DATA"
   rm -f "$USER_FILE" "$EXP_FILE"
   exit 1
 fi
 
-# 5. Validasi tanggal expired (format YYYY-MM-DD)
+# 8. Validasi format tanggal YYYY-MM-DD
 if ! printf '%s' "$EXPIRED" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
-  echo "❌ Format tanggal expired tidak valid: $EXPIRED"
+  echo "❌ FORMAT LICENSE TIDAK VALID"
+  echo "Tanggal: $EXPIRED"
   rm -f "$USER_FILE" "$EXP_FILE"
   exit 1
 fi
 
+# 9. Cek expired
 if [[ "$EXPIRED" < "$(date +%Y-%m-%d)" ]]; then
   echo "❌ LICENSE SUDAH EXPIRED"
   echo "Expired: $EXPIRED"
@@ -78,7 +75,7 @@ if [[ "$EXPIRED" < "$(date +%Y-%m-%d)" ]]; then
   exit 1
 fi
 
-# 6. Simpan license
+# 10. Simpan license
 echo "$USERNAME" > "$USER_FILE"
 echo "$EXPIRED" > "$EXP_FILE"
 export IP="$MYIP"
