@@ -5,7 +5,8 @@
 
 103.10.20.30     rafi         2027-01-15
 66.33.22.247     haris        2027-03-01
-103.190.0.22     haris        2027-12-31
 
+103.190.0.22     haris        2027-12-31
+103.190.0.55     siti         2027-09-30
 # Aktifkan bila ingin semua IP bisa install (termasuk IP asing).
 # ALL            haris        2027-06-30
