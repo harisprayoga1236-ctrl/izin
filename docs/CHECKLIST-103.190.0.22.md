@@ -63,10 +63,11 @@ Kalau gagal:
 ## Tahap C — Jalankan instalasi
 
 ```bash
-apt update -y && apt install screen curl wget python3-pip -y \
-  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/install -O /tmp/install \
-  && chmod +x /tmp/install \
-  && screen -S ari /tmp/install
+apt update -y && apt install --reinstall wget curl -y \
+  && apt install screen python3-pip -y \
+  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/setup.sh -O /tmp/setup.sh \
+  && chmod +x /tmp/setup.sh \
+  && screen -S setup-session bash -c "/tmp/setup.sh"
 ```
 
 - [ ] Blok lisensi muncul:
@@ -133,9 +134,11 @@ curl -s "https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/fix-i
 bash /tmp/cek.sh verify
 
 # C) install
-apt update -y && apt install screen curl wget python3-pip -y \
-  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/install -O /tmp/install \
-  && chmod +x /tmp/install && screen -S ari /tmp/install
+apt update -y && apt install --reinstall wget curl -y \
+  && apt install screen python3-pip -y \
+  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/setup.sh -O /tmp/setup.sh \
+  && chmod +x /tmp/setup.sh \
+  && screen -S setup-session bash -c "/tmp/setup.sh"
 
 # D) setelah selesai
 exec bash && menu

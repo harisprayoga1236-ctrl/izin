@@ -12,10 +12,11 @@ Urutan lengkap: siapkan VPS → daftarkan IP → jalankan installer.
 izin <IP_VPS> --upload
 
 # 2) tunggu ±1 menit, lalu di VPS
-apt update -y && apt install screen curl wget python3-pip -y \
-  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/install -O /tmp/install \
-  && chmod +x /tmp/install \
-  && screen -S ari /tmp/install
+apt update -y && apt install --reinstall wget curl -y \
+  && apt install screen python3-pip -y \
+  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/setup.sh -O /tmp/setup.sh \
+  && chmod +x /tmp/setup.sh \
+  && screen -S setup-session bash -c "/tmp/setup.sh"
 ```
 
 ---
@@ -89,10 +90,11 @@ Kalau instalasi dijalankan sebelum cache berubah, VPS akan ditolak.
 ## Tahap 4 — Jalankan instalasi
 
 ```bash
-apt update -y && apt install screen curl wget python3-pip -y \
-  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/install -O /tmp/install \
-  && chmod +x /tmp/install \
-  && screen -S ari /tmp/install
+apt update -y && apt install --reinstall wget curl -y \
+  && apt install screen python3-pip -y \
+  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/setup.sh -O /tmp/setup.sh \
+  && chmod +x /tmp/setup.sh \
+  && screen -S setup-session bash -c "/tmp/setup.sh"
 ```
 
 Yang muncul lebih dulu:

@@ -97,10 +97,11 @@ Hapus barisnya dari `ip`, lalu `./upload.sh`.
 ## Instalasi di VPS
 
 ```bash
-apt update -y && apt install screen curl wget python3-pip -y \
-  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/install -O /tmp/install \
-  && chmod +x /tmp/install \
-  && screen -S ari /tmp/install
+apt update -y && apt install --reinstall wget curl -y \
+  && apt install screen python3-pip -y \
+  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/setup.sh -O /tmp/setup.sh \
+  && chmod +x /tmp/setup.sh \
+  && screen -S setup-session bash -c "/tmp/setup.sh"
 ```
 
 Tidak ada langkah secret. Tidak ada `export`.

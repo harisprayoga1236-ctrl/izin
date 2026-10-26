@@ -7,6 +7,7 @@ Repo ini berisi dua hal:
 | `ip` | Daftar IP yang diizinkan menginstal |
 | `fix-izin.sh` | Script yang mencocokkan IP VPS dengan daftar |
 | `install` | Installer script (memanggil `fix-izin.sh` lebih dulu) |
+| `setup.sh` | Pemasang installer: unduh `install`, cek sintaks, lalu jalankan di `screen` |
 
 Cara kerjanya sederhana: **installer mengambil IP publik VPS, mencocokkannya
 dengan daftar di file `ip`, lalu berhenti bila tidak cocok.**
@@ -124,10 +125,11 @@ Baris baru Anda harus sudah muncul. Kalau belum, tunggu lalu ulangi.
 ### Langkah 6 — Install di VPS
 
 ```bash
-apt update -y && apt install screen curl wget python3-pip -y \
-  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/install -O /tmp/install \
-  && chmod +x /tmp/install \
-  && screen -S ari /tmp/install
+apt update -y && apt install --reinstall wget curl -y \
+  && apt install screen python3-pip -y \
+  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/setup.sh -O /tmp/setup.sh \
+  && chmod +x /tmp/setup.sh \
+  && screen -S setup-session bash -c "/tmp/setup.sh"
 ```
 
 Yang harus muncul lebih dulu:
