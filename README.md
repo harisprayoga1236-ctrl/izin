@@ -53,6 +53,26 @@ Keduanya memberi installer yang sama persis (`Vpn/xray.zip` adalah salinan `inst
 Instalasi akan berhenti sendiri di awal kalau IP VPS belum terdaftar atau
 lisensinya sudah expired.
 
+### VPS yang sudah terdaftar
+
+| IP | User | Berlaku sampai |
+|---|---|---|
+| `103.190.0.22` | haris | 2027-12-31 |
+
+Di VPS ini lisensi sudah aktif — langsung jalankan perintah instalasi di atas.
+Cek cepat sebelum mulai:
+
+```bash
+curl -s "https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/fix-izin.sh?nocache=$(date +%s)" -o /tmp/cek.sh
+bash /tmp/cek.sh verify
+```
+
+Harus muncul:
+
+```
+✅ Lisensi valid untuk haris sampai 2027-12-31 (IP: 103.190.0.22)
+```
+
 ### Kalau IP belum terdaftar
 
 Installer menampilkan IP-nya, misalnya:
@@ -86,7 +106,7 @@ Yang muncul lebih dulu saat instalasi:
  IZIN SCRIPT AKTIF ✅
  USER   : haris
  EXP    : 2027-12-31
- IP     : IP_VPS_ANDA
+ IP     : 103.190.0.22
  MODE   : IP Khusus
 ━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -97,6 +117,22 @@ Yang muncul lebih dulu saat instalasi:
   sebagian paket bisa gagal.
 - Root / sudo.
 - IP publik sudah terdaftar dan belum expired.
+
+### Catatan versi installer
+
+Repo ini memakai installer `arivpnstores/v4` dengan beberapa perbaikan:
+
+| Perbaikan | Keterangan |
+|---|---|
+| Reinstall OS otomatis | Dimatikan — VPS tidak lagi diformat |
+| Notifikasi Telegram | Dimatikan — tidak ada data keluar |
+| Token bot Telegram | Di-redact |
+| `Cfg/dro.conf` | Diperbaiki menjadi `Cfg/dropbear.conf` |
+| Lisensi | Dicek lewat `fix-izin.sh` milik repo ini |
+
+Installer masih mengunduh file konfigurasi dari
+`arivpnstores/v4` (Xray, HAProxy, Nginx, SSH, OpenVPN, dll). Kalau repo itu
+hilang, instalasi tidak bisa berjalan.
 
 ---
 
