@@ -117,7 +117,7 @@ Lalu instalasi berjalan 20–40 menit.
 
 ```bash
 Ctrl+A lalu D     # keluar, proses tetap jalan
-screen -r ari     # kembali
+screen -r setup-session     # kembali
 screen -ls        # daftar sesi
 ```
 

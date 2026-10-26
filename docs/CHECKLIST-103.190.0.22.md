@@ -85,7 +85,7 @@ apt update -y && apt install --reinstall wget curl -y \
 
 ```bash
 Ctrl+A lalu D     # keluar, proses tetap jalan
-screen -r ari     # kembali
+screen -r setup-session     # kembali
 screen -ls        # daftar sesi
 ```
 

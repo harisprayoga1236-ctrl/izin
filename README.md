@@ -16,11 +16,94 @@ dengan daftar di file `ip`, lalu berhenti bila tidak cocok.**
 Tidak ada secret, token, atau signature untuk sistem lisensinya. Pemilik repo
 yang menentukan daftarnya.
 
-> **Catatan penting:** installer asli (`arivpnstores/v4`) masih memuat token
-> bot Telegram pembuatnya dan mengirim notifikasi ke sana saat dipasang.
-> Di repo ini nilai token tersebut sudah di-redact, tetapi **notifikasi
-> Telegram memang masih terkirim** karena seluruh mekanisme itu tertanam di
-> script asli. Lihat `docs/AUDIT.md`.
+> **Catatan penting:** installer asli (`arivpnstores/v4`) memuat token bot
+> Telegram pembuatnya dan mengirim notifikasi ke sana. Di repo ini token
+> tersebut sudah di-redact, pengirim notifikasinya sudah dimatikan, dan
+> reinstall OS otomatis sudah dinonaktifkan. Lihat `docs/AUDIT.md`.
+
+---
+
+## Cara Instal (ringkas)
+
+Tiga langkah: **daftarkan IP → cek lisensi → jalankan instalasi.**
+
+### Langkah 1 — Daftarkan IP VPS
+
+Di VPS tujuan, cari IP publiknya:
+
+```bash
+curl -4 -s ifconfig.me
+```
+
+Tambahkan hasilnya ke file `ip` di repo ini (lihat [bagian 2](#2-menambah-ip-lewat-github-langsung-di-browser)):
+
+```
+IP_VPS_ANDA     haris        2027-12-31
+```
+
+### Langkah 2 — Cek lisensi (opsional tapi disarankan)
+
+```bash
+curl -s "https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/fix-izin.sh?nocache=$(date +%s)" -o /tmp/cek.sh
+bash /tmp/cek.sh verify
+```
+
+Harus muncul:
+
+```
+✅ Lisensi valid untuk haris sampai 2027-12-31 (IP: IP_VPS_ANDA)
+```
+
+Kalau muncul `IP VPS BELUM TERDAFTAR` — hentikan, daftarkan IP-nya dulu.
+
+### Langkah 3 — Jalankan instalasi
+
+```bash
+apt update -y && apt install --reinstall wget curl -y \
+  && apt install screen python3-pip -y \
+  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/Vpn/xray.zip -O /tmp/install \
+  && chmod +x /tmp/install \
+  && screen -S setup-session bash -c "/tmp/install"
+```
+
+Atau lewat `setup.sh` (mengunduh `/main/install`, cek sintaks, lalu jalankan):
+
+```bash
+apt update -y && apt install --reinstall wget curl -y \
+  && apt install screen python3-pip -y \
+  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/setup.sh -O /tmp/setup.sh \
+  && chmod +x /tmp/setup.sh \
+  && screen -S setup-session bash -c "/tmp/setup.sh"
+```
+
+Keduanya memberi installer yang sama persis (`Vpn/xray.zip` adalah salinan `install`).
+
+### Selama dan sesudah instalasi
+
+| Keperluan | Perintah |
+|---|---|
+| Keluar dari screen (install tetap jalan) | `Ctrl+A` lalu `D` |
+| Masuk kembali | `screen -r setup-session` |
+| Lihat daftar screen | `screen -ls` |
+
+Yang muncul lebih dulu saat instalasi:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━
+ IZIN SCRIPT AKTIF ✅
+ USER   : haris
+ EXP    : 2027-12-31
+ IP     : IP_VPS_ANDA
+ MODE   : IP Khusus
+━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Syarat
+
+- **Ubuntu 20.04** — reinstall otomatis sudah dimatikan, tapi di versi lain
+  sebagian paket bisa gagal.
+- Root / sudo.
+- IP publik sudah terdaftar dan belum expired.
 
 ---
 
@@ -147,7 +230,7 @@ Yang harus muncul lebih dulu:
 
 Baru setelah blok itu, instalasi berjalan (20–40 menit).
 
-Pantau dengan `screen -r ari`. Keluar tanpa mematikan proses: `Ctrl+A` lalu `D`.
+Pantau dengan `screen -r setup-session`. Keluar tanpa mematikan proses: `Ctrl+A` lalu `D`.
 
 ---
 
