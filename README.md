@@ -25,38 +25,10 @@ yang menentukan daftarnya.
 
 ## Cara Instal (ringkas)
 
-Tiga langkah: **daftarkan IP → cek lisensi → jalankan instalasi.**
+Satu langkah utama: **jalankan instalasi.** IP VPS dicek otomatis oleh
+`fix-izin.sh`, jadi Anda tidak perlu mencarinya sendiri.
 
-### Langkah 1 — Daftarkan IP VPS
-
-Di VPS tujuan, cari IP publiknya:
-
-```bash
-curl -4 -s ifconfig.me
-```
-
-Tambahkan hasilnya ke file `ip` di repo ini (lihat [bagian 2](#2-menambah-ip-lewat-github-langsung-di-browser)):
-
-```
-IP_VPS_ANDA     haris        2027-12-31
-```
-
-### Langkah 2 — Cek lisensi (opsional tapi disarankan)
-
-```bash
-curl -s "https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/fix-izin.sh?nocache=$(date +%s)" -o /tmp/cek.sh
-bash /tmp/cek.sh verify
-```
-
-Harus muncul:
-
-```
-✅ Lisensi valid untuk haris sampai 2027-12-31 (IP: IP_VPS_ANDA)
-```
-
-Kalau muncul `IP VPS BELUM TERDAFTAR` — hentikan, daftarkan IP-nya dulu.
-
-### Langkah 3 — Jalankan instalasi
+### Instalasi
 
 ```bash
 apt update -y && apt install --reinstall wget curl -y \
@@ -77,6 +49,27 @@ apt update -y && apt install --reinstall wget curl -y \
 ```
 
 Keduanya memberi installer yang sama persis (`Vpn/xray.zip` adalah salinan `install`).
+
+Instalasi akan berhenti sendiri di awal kalau IP VPS belum terdaftar atau
+lisensinya sudah expired.
+
+### Kalau IP belum terdaftar
+
+Installer menampilkan IP-nya, misalnya:
+
+```
+❌ IP VPS BELUM TERDAFTAR
+    IP: 103.190.0.55
+```
+
+Tambahkan baris itu ke file `ip` (lihat [bagian 2](#2-menambah-ip-lewat-github-langsung-di-browser)), lalu ulangi perintah di atas:
+
+```
+103.190.0.55     haris        2027-12-31
+```
+
+> Opsional: `curl -4 -s ifconfig.me` hanya untuk memastikan IP yang dilihat VPS
+> sama dengan yang Anda daftarkan. Tidak wajib.
 
 ### Selama dan sesudah instalasi
 
