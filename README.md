@@ -11,7 +11,14 @@ Repo ini berisi dua hal:
 Cara kerjanya sederhana: **installer mengambil IP publik VPS, mencocokkannya
 dengan daftar di file `ip`, lalu berhenti bila tidak cocok.**
 
-Tidak ada secret, token, atau signature. Pemilik repo yang menentukan daftarnya.
+Tidak ada secret, token, atau signature untuk sistem lisensinya. Pemilik repo
+yang menentukan daftarnya.
+
+> **Catatan penting:** installer asli (`arivpnstores/v4`) masih memuat token
+> bot Telegram pembuatnya dan mengirim notifikasi ke sana saat dipasang.
+> Di repo ini nilai token tersebut sudah di-redact, tetapi **notifikasi
+> Telegram memang masih terkirim** karena seluruh mekanisme itu tertanam di
+> script asli. Lihat `docs/AUDIT.md`.
 
 ---
 
