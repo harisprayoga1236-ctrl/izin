@@ -8,6 +8,7 @@ Repo ini berisi dua hal:
 | `fix-izin.sh` | Script yang mencocokkan IP VPS dengan daftar |
 | `install` | Installer script (memanggil `fix-izin.sh` lebih dulu) |
 | `setup.sh` | Pemasang installer: unduh `install`, cek sintaks, lalu jalankan di `screen` |
+| `Vpn/xray.zip` | Salinan `install` dengan nama warisan arivpnstores. Disamakan lewat `./sync-vpn.sh` |
 
 Cara kerjanya sederhana: **installer mengambil IP publik VPS, mencocokkannya
 dengan daftar di file `ip`, lalu berhenti bila tidak cocok.**
