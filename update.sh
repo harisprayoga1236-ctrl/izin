@@ -22,6 +22,39 @@ fetch() {
   [ -s "$dest" ] || { printf 'ERROR: unduhan kosong: %s\n' "$name" >&2; exit 1; }
 }
 
+install_xray_binary() {
+  local meta="$TMP_DIR/xray-release.json" asset_url digest_url archive="$TMP_DIR/xray.zip"
+  printf '%s\n' 'Mengunduh binary Xray resmi...'
+  curl -fsSL --max-time 30 https://api.github.com/repos/XTLS/Xray-core/releases/latest -o "$meta"
+  read -r asset_url digest_url < <(python3 -I - "$meta" <<'PY'
+import json, sys
+release=json.load(open(sys.argv[1]))
+urls={a['name']: a['browser_download_url'] for a in release['assets']}
+print(urls.get('Xray-linux-64.zip',''), urls.get('Xray-linux-64.zip.dgst',''))
+PY
+)
+  [ -n "$asset_url" ] && [ -n "$digest_url" ] || { printf '%s\n' 'ERROR: aset Xray Linux x64 tidak ditemukan.' >&2; return 1; }
+  curl -fsSL --max-time 120 "$asset_url" -o "$archive"
+  curl -fsSL --max-time 30 "$digest_url" -o "$TMP_DIR/xray.dgst"
+  local expected actual
+  expected=$(awk -F'= ' '/^SHA2-256=/{print $2}' "$TMP_DIR/xray.dgst")
+  actual=$(sha256sum "$archive" | awk '{print $1}')
+  [ -n "$expected" ] && [ "$expected" = "$actual" ] || { printf '%s\n' 'ERROR: checksum binary Xray tidak cocok.' >&2; return 1; }
+  mkdir -p "$TMP_DIR/xray-extracted"
+  python3 -I - "$archive" "$TMP_DIR/xray-extracted" <<'PY'
+import sys
+from pathlib import Path
+from zipfile import ZipFile
+src=Path(sys.argv[1]); out=Path(sys.argv[2]); out.mkdir(parents=True, exist_ok=True)
+with ZipFile(src) as z: z.extractall(out)
+PY
+  [ -x "$TMP_DIR/xray-extracted/xray" ] || chmod 755 "$TMP_DIR/xray-extracted/xray"
+  install -m 0755 "$TMP_DIR/xray-extracted/xray" /usr/local/bin/xray
+  install -m 0644 "$TMP_DIR/xray-extracted/geoip.dat" /usr/local/bin/geoip.dat
+  install -m 0644 "$TMP_DIR/xray-extracted/geosite.dat" /usr/local/bin/geosite.dat
+  printf '%s\n' 'Binary Xray terpasang dan checksum terverifikasi.'
+}
+
 printf '%s\n' 'Memeriksa lisensi...'
 fetch fix-izin.sh "$TMP_DIR/fix-izin.sh"
 chmod 700 "$TMP_DIR/fix-izin.sh"
@@ -51,6 +84,10 @@ install -m 755 "$TMP_DIR/install" /usr/local/bin/izin-install
 install -m 755 "$TMP_DIR/xray.zip" /usr/local/bin/izin-xray.zip
 install -m 755 "$TMP_DIR/repair-services.sh" /usr/local/bin/izin-repair-services
 install -m 755 "$TMP_DIR/fix-izin.sh" /usr/local/bin/izin-fix-license
+
+if [ "${INSTALL_XRAY:-1}" = 1 ]; then
+  install_xray_binary
+fi
 
 printf '%s\n' 'File updater berhasil diperbarui.'
 printf 'Backup: %s\n' "$BACKUP_DIR"
