@@ -49,11 +49,7 @@ src=Path(sys.argv[1]); out=Path(sys.argv[2]); out.mkdir(parents=True, exist_ok=T
 with ZipFile(src) as z: z.extractall(out)
 PY
   [ -x "$TMP_DIR/xray-extracted/xray" ] || chmod 755 "$TMP_DIR/xray-extracted/xray"
-  if [ "$xb" != /usr/local/bin/xray ]; then
-    install -m 0755 "$TMP_DIR/xray-extracted/xray" /usr/local/bin/xray
-  else
-    chmod 0755 /usr/local/bin/xray
-  fi
+  install -m 0755 "$TMP_DIR/xray-extracted/xray" /usr/local/bin/xray
   install -d -m 0755 /usr/local/share/xray
   install -m 0644 "$TMP_DIR/xray-extracted/geoip.dat" /usr/local/share/xray/geoip.dat
   install -m 0644 "$TMP_DIR/xray-extracted/geosite.dat" /usr/local/share/xray/geosite.dat
