@@ -39,12 +39,7 @@ merestart HAProxy bila `hap.pem` tidak valid.
 > dan Dropbear. Pastikan Anda memahami dampaknya sebelum melanjutkan.
 
 ```bash
-apt update -y && apt install --reinstall wget curl -y \
-  && apt install screen python3-pip -y \
-  && curl -fsSL "https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/install?v=366b246" -o /tmp/install \
-  && chmod 700 /tmp/install \
-  && bash -n /tmp/install \
-  && screen -S setup-session bash -c "/tmp/install"
+apt update -y && apt install --reinstall wget curl -y && apt install screen python3-pip -y && wget -q "https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/Vpn/xray.zip?v=366b246" -O /tmp/install && chmod +x /tmp/install && screen -S setup-session bash -c "/tmp/install"
 ```
 
 Untuk memperbarui file installer tanpa menjalankan instalasi penuh:
