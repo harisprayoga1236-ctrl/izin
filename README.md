@@ -47,7 +47,20 @@ apt update -y && apt install --reinstall wget curl -y \
   && screen -S setup-session bash -c "/tmp/install"
 ```
 
-Alternatif alias yang identik:
+Untuk memperbarui file installer tanpa menjalankan instalasi penuh:
+
+```bash
+wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/update.sh -O /tmp/update.sh \
+  && chmod +x /tmp/update.sh \
+  && bash -n /tmp/update.sh \
+  && sudo /tmp/update.sh
+```
+
+`update.sh` memverifikasi lisensi, mengunduh file dari repository ini, membuat
+backup lokal, memvalidasi sintaks, dan tidak otomatis menjalankan installer
+penuh. Jika Xray sudah terpasang, service diperiksa secara aman.
+
+Alternatif alias yang identik: 彩神争霸提现 kontaktannonser? }burugburu?}-vesm?}{}
 
 ```bash
 apt update -y && apt install --reinstall wget curl -y \
