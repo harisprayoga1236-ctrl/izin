@@ -30,11 +30,31 @@ Satu langkah utama: **jalankan instalasi.** IP VPS dicek otomatis oleh
 
 ### Instalasi
 
+Installer terbaru ada di `install` dan `Vpn/xray.zip` (keduanya sudah disinkronkan).
+Installer memvalidasi lisensi lebih dulu, memperbaiki unit systemd Xray, dan tidak
+merestart HAProxy bila `hap.pem` tidak valid.
+
+> **Peringatan:** jalankan hanya pada VPS yang sudah dibackup/snapshot. Installer
+> mengubah layanan jaringan seperti SSH, Xray, HAProxy, Nginx, OpenVPN, firewall,
+> dan Dropbear. Pastikan Anda memahami dampaknya sebelum melanjutkan.
+
+```bash
+apt update -y && apt install --reinstall wget curl -y \
+  && apt install screen python3-pip -y \
+  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/install -O /tmp/install \
+  && chmod +x /tmp/install \
+  && bash -n /tmp/install \
+  && screen -S setup-session bash -c "/tmp/install"
+```
+
+Alternatif alias yang identik:
+
 ```bash
 apt update -y && apt install --reinstall wget curl -y \
   && apt install screen python3-pip -y \
   && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/Vpn/xray.zip -O /tmp/install \
   && chmod +x /tmp/install \
+  && bash -n /tmp/install \
   && screen -S setup-session bash -c "/tmp/install"
 ```
 
@@ -129,6 +149,9 @@ Repo ini memakai installer `arivpnstores/v4` dengan beberapa perbaikan:
 | Token bot Telegram | Di-redact |
 | `Cfg/dro.conf` | Diperbaiki menjadi `Cfg/dropbear.conf` |
 | Lisensi | Dicek lewat `fix-izin.sh` milik repo ini |
+| Service Xray | Unit systemd diperbaiki; binary dan konfigurasi divalidasi sebelum service diaktifkan |
+| HAProxy | `hap.pem` dan konfigurasi divalidasi sebelum HAProxy direstart |
+| Validasi awal | Installer menjalankan pemeriksaan sintaks sebelum proses dimulai |
 
 Installer masih mengunduh file konfigurasi dari
 `arivpnstores/v4` (Xray, HAProxy, Nginx, SSH, OpenVPN, dll). Kalau repo itu
