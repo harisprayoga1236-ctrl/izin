@@ -41,8 +41,8 @@ merestart HAProxy bila `hap.pem` tidak valid.
 ```bash
 apt update -y && apt install --reinstall wget curl -y \
   && apt install screen python3-pip -y \
-  && wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/install -O /tmp/install \
-  && chmod +x /tmp/install \
+  && curl -fsSL "https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/install?v=366b246" -o /tmp/install \
+  && chmod 700 /tmp/install \
   && bash -n /tmp/install \
   && screen -S setup-session bash -c "/tmp/install"
 ```
@@ -50,10 +50,10 @@ apt update -y && apt install --reinstall wget curl -y \
 Untuk memperbarui file installer tanpa menjalankan instalasi penuh:
 
 ```bash
-wget -q https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/update.sh -O /tmp/update.sh \
-  && chmod +x /tmp/update.sh \
+curl -fsSL "https://raw.githubusercontent.com/harisprayoga1236-ctrl/izin/main/update.sh?v=366b246" -o /tmp/update.sh \
+  && chmod 700 /tmp/update.sh \
   && bash -n /tmp/update.sh \
-  && sudo /tmp/update.sh
+  && sudo bash /tmp/update.sh
 ```
 
 `update.sh` memverifikasi lisensi, mengunduh file dari repository ini, membuat
